@@ -14,7 +14,7 @@ The overall structure is contained in the top level file Claw_Machine.ino. Most 
 This claw system relies on serveral different sets of inputs:
 
 Claw Movment inputs:
-1. X, Y, Z positive and negative values (Z controlled by two separate buttons, X and Y controlled by joystick)
+1. X, Y, Z positive and negative direction controls (Z controlled by two separate buttons, X and Y controlled by joystick)
 2. X, Y, minimum/maximum direction detection. Z minimum direction detection. (so directions aren't driven outside of bounds)
 3. Claw Open/Close motion driving (Controlled by two separate buttons)
 
@@ -38,6 +38,10 @@ Contains six game control functions:
 5. homingSequence     -Handles static (unchanging) homing movement sequence where claw is returned to 0 X, Y, and Z positions, and claw opens and then closes
 6. gameInitialize     -Initialize game mode on display, and set stepper motors to power-on state
 
+Most of the display outputs are handled in this file:
+1. (delcared in Claw_Machine_Constants but written to mostly in this file): 
+LiquidCrystal_I2C lcd(0x27, 20, 4) in I2C.
+
 # Claw_Movement_Functions.h FILE:
 
 Contains global timing variables, global position variables, and global direction motion variables.
@@ -54,7 +58,14 @@ X and Z direction movement is naturally very smooth. The game is rigged such tha
 6. writeClawClose   - Handles non-active claw to closed position rotation movement.
 
 Contains one "future use" function:
-1. recalibrate      -
+1. recalibrate      - Counts number of steps from each motor to move the claw all the way in the X, Y, and Z directions. This information can be used by a function that would drive the claw to a specific X, Y, Z position. As of now, above functions are more than sufficient for the control of the claw.
+
+Most of the claw movement outputs are handled in this file:
+1. X, Y, Z stepper pins used to drive stepper motors. A stepper motor must be written to 1 and 0 before it will move one step.
+2. X, Y, Z direction pins. Tells a stepper motor which direction to step when it receives a full step cycle.
+3. Stepper enable pin used to give power to the stepper motors.
+4. Servo motor pin "attached" using servo motor library. Writes angle value to servo motor used in opening/closing claw.
+5. Servo Relay pin used to power servo motor
 
 # Claw_Machine_Constants.h FILE:
 

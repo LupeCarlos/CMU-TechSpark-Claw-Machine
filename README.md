@@ -70,3 +70,7 @@ Most of the claw movement outputs are handled in this file:
 # Claw_Machine_Constants.h FILE:
 
 Contains all pin assignment constants for Arduino. Contains display setup information and constant display writes.
+
+constant display writes functions:
+1. lcdSetup         - Handles initialization of lcd display
+2. lcdWriteDefault  - Handles default LCD display for when game is not active. Includes whether game is in arcade mode or full control mode, and instructions for starting the game.

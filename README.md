@@ -44,13 +44,17 @@ Contains six game control functions:
 
 Contains global timing variables, global position variables, and global direction motion variables.
 
-Contains six active claw movement variables:
-1. XYZservo         -
-2. OpenClose        -
-3. writeClawmS      -
-4. writeClawBar     -
-5. writeClawOpen    -
-6. writeClawClose   -
+Contains six active claw movement functions:
+1. XYZservo         -Handles "active" (while game is live) X, Y and Z movement logic. All "active" motion is controlled via time-based waits. This allows concurrency between different directions (claw can move in X, Y, and Z directions at once) even though stepper motors step pins must necessarily wait between being assigned high and low to perform a full motion. Every other millisecond, a stepper motor's step pin is assigned to be 1 or not based on if it has received a signal to move in that direction. Then on the alternating millisecond, every stepper motor step pin is assigned to zero. If a signal has occurred to move in any combination of directions, there will be the required fluctuation in step pins for that combination. There is one stipulation to this rule:
+
+X and Z direction movement is naturally very smooth. The game is rigged such that the claw travels in the Z direction on a string using one stepper motor, and in the X direction upon one bar also using one stepper motor. However, when the claw travels in the Y direction it has to move the entire X-direction bar, and must use two stepper motors. This introduces a large amount of vibration and is very harsh on the mechanical aspects of this project. In order to handle this issue, microstepping is used for the two y-direction stepper motors. This smooths the movement but slows down the speed in the y direction. To handle this, the y direction movement is handled every 400 microseconds instead of every millisecond. This direction uses a wait specifically, but is fast enough compared to the other directions that it is not noticeable. 
+
+2. OpenClose        - Handles "active" claw rotation movement using a servo motor. This allows us to write to a specific angle. The current claw angle is calculated at each step, and then written to increment or decrement depending on whether or not the claw open/close buttons are pressed. Because the servo is handled slightly differently from the steppers, the functions are different. However, because a time-based activation is still used, the claw can be opened or closed at the same time the claw is moving in any X, Y, and/or Z direction
+3. writeClawmS      - Handles non-active claw rotation and X, Y, Z motion in terms of number of milliseconds. A motion will still not be carried out if the claw is already at the limit in that direction.  Otherwise, the claw will move in the specified direction for the specified amount of time in milliseconds. Because the value that the claw rotation will write to is known, the rotation can be included in this function. This allows for motion directly writing the claw closed so it will hold onto the toy. This function is primarily used in the arcadeSequence function to grab the toy automatically. Time-based activation is still used because I think it is quite elegant.
+4. writeClawBar     - Handles non-active claw X, Y, Z motion in terms of position relative to a specific set of edges. This function will run until the claw has hit all edges specified, and then will stop. This function is used primarily in the homingSequence function to return the claw to its zero positions above the toy exit zone. Because there is no Z negative edge, that direction is not an option. Because there is no feedback from the servo motor to tell us where it is currently located, two extra functions for writing the claw all the way to open and all the way to closed are used:
+5. writeClawOpen    - Handles non-active claw to open position rotation movement.
+6. writeClawClose   - Handles non-active claw to closed position rotation movement.![image](https://user-images.githubusercontent.com/90006904/143777396-8b093d22-6710-4a37-bb67-6b7f3818a666.png)
+
 
 Contains one "future use" function:
 1. recalibrate      -

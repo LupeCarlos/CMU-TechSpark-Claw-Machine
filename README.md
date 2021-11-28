@@ -9,9 +9,7 @@ This repo consists of four files:
 
 # Claw_Machine.ino FILE:
 
-The overall structure is contained in the top level file Claw_Machine.ino. Most of the inputs from the claw buttons are handled in this file,
-and are distributed to different game functions based on what they are used for. Ie. Start button's input is sent to functions in
-Claw_Game_Control_Functions.h, and direction inputs are sent to functions in Claw_Movement_functions.h. 
+The overall structure is contained in the top level file Claw_Machine.ino. Most of the inputs from the claw buttons are handled in this file, and are distributed to different game functions based on what they are used for. Ie. Start button's input is sent to functions in Claw_Game_Control_Functions.h, and direction inputs are sent to functions in Claw_Movement_functions.h. 
 
 This claw system relies on serveral different sets of inputs:
 
@@ -53,8 +51,7 @@ X and Z direction movement is naturally very smooth. The game is rigged such tha
 3. writeClawmS      - Handles non-active claw rotation and X, Y, Z motion in terms of number of milliseconds. A motion will still not be carried out if the claw is already at the limit in that direction.  Otherwise, the claw will move in the specified direction for the specified amount of time in milliseconds. Because the value that the claw rotation will write to is known, the rotation can be included in this function. This allows for motion directly writing the claw closed so it will hold onto the toy. This function is primarily used in the arcadeSequence function to grab the toy automatically. Time-based activation is still used because I think it is quite elegant.
 4. writeClawBar     - Handles non-active claw X, Y, Z motion in terms of position relative to a specific set of edges. This function will run until the claw has hit all edges specified, and then will stop. This function is used primarily in the homingSequence function to return the claw to its zero positions above the toy exit zone. Because there is no Z negative edge, that direction is not an option. Because there is no feedback from the servo motor to tell us where it is currently located, two extra functions for writing the claw all the way to open and all the way to closed are used:
 5. writeClawOpen    - Handles non-active claw to open position rotation movement.
-6. writeClawClose   - Handles non-active claw to closed position rotation movement.![image](https://user-images.githubusercontent.com/90006904/143777396-8b093d22-6710-4a37-bb67-6b7f3818a666.png)
-
+6. writeClawClose   - Handles non-active claw to closed position rotation movement.
 
 Contains one "future use" function:
 1. recalibrate      -

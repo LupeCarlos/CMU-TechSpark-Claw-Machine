@@ -1,10 +1,12 @@
 // Lupe Carlos || Brian Lee || Ryan Bates
 // TechSpark Claw Machine
 // 8/30/2021
+//
+// Lengthy description in README
 
 //game assignment variables
 bool arcadeMode; //1: arcade mode, 0: full control
-int gameTimeS = 30;//length of game in seconds
+int gameTimeS = 30; //length of game in seconds
 
 //Claw open/close speed is based off of "what feels right"
 int openSpeed = 50; //how fast claw will open/close
@@ -31,10 +33,6 @@ void setup() {
   
   //set up LCD screen with start values for game
   lcdSetup();
-
-  //calibrate machine for xyz coordinatess
-  //recalibrate();
-    
 
 }
 
@@ -73,17 +71,26 @@ void loop() {
     }
 
     XYZservo(right, left, forward, backward, up, down);
-    prevFB = forward || backward;
     
   } else {
-    potentiometer = analogRead(potPin);
-    if (abs(potentiometer - potentiometer_prev) > 8) {
-      gameTimeS = 30 + ((512 - potentiometer))/17;
     
+    //GAME TIME CONTROL USING POTENTIOMETER
+    potentiometer = analogRead(potPin);
+
+    //if the potentiometer has changed by more than 8 values
+    //(to get rid of noise or small bumps)
+    if (abs(potentiometer - potentiometer_prev) > 8) {
+
+      //set gameTime actively based off of 
+      gameTimeS = 30 + ((512 - potentiometer))/17;
+
+      //actively print game time on display
       lcd.setCursor(9,3);
       lcd.print("   ");
       lcd.setCursor(9,3);
       lcd.print(gameTimeS);
+
+      //save old potentiometer value so we know how much to change
       potentiometer_prev = potentiometer;
     }
   }

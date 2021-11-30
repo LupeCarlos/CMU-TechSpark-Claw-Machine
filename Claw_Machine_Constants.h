@@ -3,6 +3,8 @@
 // Lupe Carlos || Brian Lee || Ryan Bates
 // TechSpark Claw Machine
 // 8/30/2021
+//
+// Lengthy description in README
 
 //TODO: make it so if I click the green button again during game, does nothing or game ends
 //TODO: add adafruit neopixel library and LED strips
@@ -19,7 +21,6 @@ Servo servoClaw;
 LiquidCrystal_I2C lcd(0x27, 20, 4);
 
 //Special byte characters for loading bar lcd
-
 byte one[] = {
   B10000,
   B10000,
@@ -138,16 +139,17 @@ int barWidth = 20;
 void pinAssign(){
   pinMode(xStepPin, OUTPUT);
   pinMode(xDirPin, OUTPUT);
-  
   pinMode(y1StepPin, OUTPUT);
   pinMode(y1DirPin, OUTPUT);
   pinMode(y2StepPin, OUTPUT);
   pinMode(y2DirPin, OUTPUT);
   pinMode(zStepPin, OUTPUT);
   pinMode(zDirPin, OUTPUT);
+  
   pinMode(stepperEnable, OUTPUT);
   
   pinMode(servoRelay, OUTPUT);
+  servoClaw.attach(clawPin);
 
   pinMode(xMinLmtSwtch, INPUT_PULLUP);
   pinMode(xMaxLmtSwtch, INPUT_PULLUP);
@@ -169,9 +171,9 @@ void pinAssign(){
 
   pinMode(potPin, INPUT);
 
-  servoClaw.attach(clawPin);
 }
 
+//write default to LCD when game is off
 void lcdWriteDefault(){
   lcd.clear();
   lcd.setCursor(0,0);
@@ -187,6 +189,7 @@ void lcdWriteDefault(){
   lcd.print("seconds");
 }
 
+//setup the LCD display
 void lcdSetup(){
   lcd.begin();
   lcd.createChar(1, one);

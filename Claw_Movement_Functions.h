@@ -1,6 +1,8 @@
 // Lupe Carlos || Brian Lee || Ryan Bates
 // TechSpark Claw Machine
 // 8/30/2021
+//
+// Lengthy description in README
 
 //initialize loop variables
 
@@ -23,6 +25,8 @@ unsigned long FBmillis = 0;
 //global timing variables
 unsigned long millisCount = 0;
 unsigned long currentMillis = 0;
+unsigned long microsCount = 0;
+unsigned long currentMicros = 0;
 
 //global positioning system ;)
 unsigned long zUpSteps = 0;
@@ -33,7 +37,6 @@ unsigned long xStepPosition = 0;
 unsigned long yStepPosition = 0;
 unsigned long zStepPosition = 0;
 
-
 //Continuous-time Claw direction movement (while game is running)
 void XYZservo(bool right, bool left, bool forward, bool backward, bool up, bool down){
 
@@ -41,7 +44,7 @@ void XYZservo(bool right, bool left, bool forward, bool backward, bool up, bool 
   bool FB = forward || backward;
   bool UD = up || down;
   
-  bool dirWrite = ((currentMillis % 13) == 0);
+  bool dirWrite = ((currentMillis % 15) == 0);
 
   if (LR) {
     if (dirWrite) {
@@ -50,23 +53,20 @@ void XYZservo(bool right, bool left, bool forward, bool backward, bool up, bool 
     
     digitalWrite(xStepPin, ((currentMillis % 2) == 1));
   }
-    
+ 
   if (FB) { 
     if (dirWrite) {
       digitalWrite(y1DirPin, forward);
       digitalWrite(y2DirPin, backward);
     }
-
-    if (!prevFB) { 
-      FBmillis = millis() + 1;
-      Serial.println("saw start of move");
-    }
     
-    unsigned long FBdiff = millis() - FBmillis;
-    int modFB = 2 + 1000/(400 + FBdiff);
-
-    digitalWrite(y1StepPin, ((currentMillis % modFB) == 1));
-    digitalWrite(y2StepPin, ((currentMillis % modFB) == 1));
+    digitalWrite(y1StepPin, 1);
+    digitalWrite(y2StepPin, 1);
+    delayMicroseconds(400);
+    digitalWrite(y1StepPin, 0);
+    digitalWrite(y2StepPin, 0);
+    delayMicroseconds(400);
+    
   }
   
   if (UD) {
@@ -88,8 +88,7 @@ int openClose(bool opening, bool closing, int clawCurValue){
 }
 
 //Specific-time direction and open/close movement (for directed movement sequences)
-void writeClawmS(int mS, bool 
-, bool left, bool forward, bool backward, bool up, bool down, bool op, bool cl){
+void writeClawmS(int mS, bool right, bool left, bool forward, bool backward, bool up, bool down, bool op, bool cl){
   bool LR = (right && digitalRead(xMaxLmtSwtch))  || (left && digitalRead(xMinLmtSwtch));
   bool FB = (forward && digitalRead(yMaxLmtSwtch)) || (backward && digitalRead(yMinLmtSwtch));
   bool UD = (up && digitalRead(zMaxLmtSwtch)) || down;
@@ -101,9 +100,10 @@ void writeClawmS(int mS, bool
   digitalWrite(zDirPin, up);
   int ope = op ? 120 : 0;
 
+  digitalWrite(stepperEnable, LOW);
   digitalWrite(servoRelay, HIGH);
   unsigned long millisCountmS = millis();
-  unsigned long currentMillismS; 
+  unsigned long currentMillismS = 0; 
   while (currentMillismS < mS){
     currentMillismS = millis() - millisCountmS;
     
@@ -128,6 +128,8 @@ void writeClawmS(int mS, bool
     
     if (OC) {servoClaw.write(ope); }
   }
+  
+  digitalWrite(stepperEnable, HIGH);
 }
 
 //Move-to-bar direction and open/close movement (for directed movement sequences)
@@ -144,41 +146,47 @@ void writeClawBar(bool right, bool left, bool forward, bool backward, bool up){
   else if (backward) { yStepPosition = 0; }
   if (up)            { zStepPosition = 0; }
 
+  digitalWrite(stepperEnable, LOW);
+
   while ((right && digitalRead(xMaxLmtSwtch)) || (left && digitalRead(xMinLmtSwtch)) || 
          (forward && digitalRead(yMaxLmtSwtch)) || (backward && digitalRead(yMinLmtSwtch)) ||
          (up && digitalRead(zMaxLmtSwtch))){
+
+    unsigned long WBCmillis = millis();
     
     if ((right && digitalRead(xMaxLmtSwtch)) || (left && digitalRead(xMinLmtSwtch))) {
-      digitalWrite(xStepPin, HIGH);
+      digitalWrite(xStepPin, ((WBCmillis % 2) == 1));
     }
 
     if ((forward && digitalRead(yMaxLmtSwtch)) || (backward && digitalRead(yMinLmtSwtch))) {
       digitalWrite(y1StepPin, HIGH); digitalWrite(y2StepPin, HIGH); 
+      delayMicroseconds(400);
+      digitalWrite(y1StepPin, LOW);
+      digitalWrite(y2StepPin, LOW);
+      delayMicroseconds(400);
     }
 
     if (up && digitalRead(zMaxLmtSwtch)) {
-      digitalWrite(zStepPin, HIGH);
+      digitalWrite(zStepPin, ((WBCmillis % 2) == 1));
     }
-
-    delay(1);
-    digitalWrite(xStepPin, LOW);
-    digitalWrite(y1StepPin, LOW);
-    digitalWrite(y2StepPin, LOW);
-    digitalWrite(zStepPin, LOW);
-    delay(1);
+    
   }
+  
+  digitalWrite(stepperEnable, HIGH);
 }
 
+//write claw to fully open position
 void writeClawOpen(){
-  Serial.write("saw claw open cmd\n");
   writeClawmS(1000, 0, 0, 0, 0, 0, 0, 1, 0); //open
 }
 
+//write claw to fully closed position
 void writeClawClose(){
-  Serial.write("saw claw close cmd\n");
   writeClawmS(1000, 0, 0, 0, 0, 0, 0, 0, 1); //close
 }
 
+/*
+//calculte size of claw area in stepper motor steps
 void recalibrate(){
   
   unsigned long xRightSteps = 0;
@@ -228,6 +236,5 @@ void recalibrate(){
   zDistanceSteps = zDistanceSteps/2;
   
   digitalWrite(stepperEnable, HIGH);
-
-  delay(30000); 
 }
+*/

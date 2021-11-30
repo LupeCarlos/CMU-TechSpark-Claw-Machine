@@ -65,12 +65,6 @@ void homingSequence(){
 
 //update LCD during game time
 void gameOnLcdUpdate(unsigned long currentMillis){
-  
-    //Update loading bar every 50th of amount of total game time
-    //if ((currentMillis % (10*gameTimeS)) == 0){
-    //  lcd.setCursor((currentMillis/(50*gameTimeS)),2);
-    //  lcd.write(1 + (currentMillis/(10*gameTimeS) % 5));
-    //}
 
     //every second, update the amount of time left
     if ((currentMillis % 1000) == 0){
